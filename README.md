@@ -26,3 +26,15 @@ Max Bandwidth Per Month 1 GB
   * fidelity_retirement.csv
   * vanguard.csv
 * Blur out y-axis of charts and post examples
+
+## Next
+1. Ally climate
+2. Vanguard climate
+3. Add all climate funds together
+4. Index funds
+5. Tesla
+6. Zoom
+7. Google
+8. Each individual fund
+9. All funds together
+10. 

@@ -15,6 +15,19 @@ class Finance():
         self.brokerages = [Fidelity(), Ally(), Vanguard()]
         self.retirement = FidelityRetirementFund()
 
+    def choose_brokerage(self, brokerage):
+        if brokerage == 'fidelity':
+            return Fidelity()
+        elif brokerage == 'vanguard':
+            return Vanguard()
+        elif brokerage == 'ally':
+            return Ally()
+        elif brokerage == 'retirement':
+            return FidelityRetirementFund()
+        else:
+            # TODO: Add error handling
+            return None
+
     def plot_retirement_fund(self):
         df = self.retirement.convert_to_df()
         DataPlotter().draw(df, self.retirement.ticker, self.retirement.additional_title_text)
@@ -23,20 +36,28 @@ class Finance():
         print([ticker['ticker'] for ticker in self.mappings if tag in ticker['tags']])
         print([ticker['brokerages'] for ticker in self.mappings if tag in ticker['tags']])
 
-    def plot_historical_performance(self, tag):
-        for brokerage in self.brokerages:
-            tag_funds = [ticker['ticker'] for ticker in self.mappings
-                         if tag in ticker['tags'] and brokerage.name in ticker['brokerages']]
-            for ticker in tag_funds:
-                print(f'Plot historical performance for {ticker.upper()}? (y/n)')
-                choice = input()
-                if choice == 'y':
-                    df = brokerage.convert_to_df(ticker)
-                    DataPlotter().draw(df, ticker, brokerage.additional_title_text)
-                else:
-                    continue
-            # have only implemented Fidelity so far
-            exit(0)
+    def plot_historical_performance(self, ticker='', tag=''):
+        if ticker:
+            # TODO: add handling if can't find ticker in mappings
+            # TODO: add check for multiple brokerages bleh.
+            brokerage_info = [ticker_info for ticker_info in self.mappings if ticker_info['ticker'] == ticker][0]['brokerages'][0]
+            brokerage = self.choose_brokerage(brokerage_info)
+            df = brokerage.convert_to_df(ticker)
+            DataPlotter().draw(df, ticker, brokerage.additional_title_text)
+        elif tag:
+            for brokerage in self.brokerages:
+                tag_funds = [ticker['ticker'] for ticker in self.mappings
+                             if tag in ticker['tags'] and brokerage.name in ticker['brokerages']]
+                for ticker in tag_funds:
+                    print(f'Plot historical performance for {ticker.upper()}? (y/n)')
+                    choice = input()
+                    if choice == 'y':
+                        df = brokerage.convert_to_df(ticker)
+                        DataPlotter().draw(df, ticker, brokerage.additional_title_text)
+                    else:
+                        continue
+                # have only implemented Fidelity so far
+                exit(0)
 
 
 if __name__ == '__main__':
@@ -55,6 +76,7 @@ Usage:
 ./finance.py --rsu            Displays progress chart for RSUs
 """
     parser = argparse.ArgumentParser(description=help_description, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-t', '--ticker', type=str, help='ticker symbol', required=False)
     parser.add_argument('--climate', action='store_true', help='Displays progress chart for all fossil-free funds')
     parser.add_argument('--retirement', action='store_true', help='Displays progress chart for 401(k)')
 
@@ -62,8 +84,13 @@ Usage:
         parser.print_help()
         exit(0)
 
-    f = Finance()
+    # TODO: Add error handling
     args = parser.parse_args()
+    print(args)
+
+    f = Finance()
+    if args.ticker:
+        f.plot_historical_performance(ticker=args.ticker)
     if args.climate:
         f.list_funds_with_tag('climate')
         f.plot_historical_performance(tag='climate')
