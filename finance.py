@@ -22,7 +22,7 @@ class Finance():
             return Vanguard()
         elif brokerage == 'ally':
             return Ally()
-        elif brokerage == 'retirement':
+        elif brokerage == 'fidelity_retirement':
             return FidelityRetirementFund()
         else:
             # TODO: Add error handling
