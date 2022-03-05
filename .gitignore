@@ -1,0 +1,8 @@
+logs/
+charts/
+positions/
+venv/
+__pycache__/
+.idea/
+.DS_Store
+scratch/
