@@ -5,6 +5,8 @@
 2. Need to download the latest csv from Vanguard, clean format, and save in `positions/vanguard_brokerage.json`.
 3. Download your 401k transaction history in CSV format from the Fidelity site: https://workplaceservices.fidelity.com/mybenefits/savings2/navigation/dc/History. You can specify the time range you want.
 4. Ally should be OK b/c we will be pulling live from API. 
+5. Actually to get more than 18 months back from Vanguard, you need to generate PDF from custom report, then convert to CSV using https://pdftables.com/. 
+
 
 ## API keys needed
 

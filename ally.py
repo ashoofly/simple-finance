@@ -44,6 +44,6 @@ if __name__ == "__main__":
     print(a.get_holdings())
     #print(json.dumps(a.get_history('GOOG'), indent=2))
     #print(json.dumps(a.get_history('QCLN'), indent=2))
-    print(a.convert_to_df('TSLA'))
+    print(a.convert_to_df('ZM'))
     #print(json.dumps(a.get_history('TSLA'), indent=2))
     #print(json.dumps(a.get_history('ZM'), indent=2))

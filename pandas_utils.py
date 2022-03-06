@@ -9,8 +9,25 @@ class DFBuilder:
     def build(self):
         return self.df
 
+    def filter_rows_by_column_value(self, col_name, col_value):
+        self.df = self.df[self.df[col_name] == col_value]
+        return self
+
+    def filter_rows_by_condition(self):
+        self.df = self.df[pd.to_numeric(self.df['Quantity'], errors='coerce')]
+        return self
+
+    def choose_relevant_cols_for_df(self, col_names):
+        self.df = self.df[col_names]
+        return self
+
     def convert_to_datetime(self, column):
         self.df[column] = pd.to_datetime(self.df[column])
+        return self
+
+    def convert_to_numeric_or_else_drop(self, column):
+        self.df[column] = pd.to_numeric(self.df[column], errors='coerce')
+        self.df = self.df.dropna()
         return self
 
     def group_rows_by_month(self, date_column):
@@ -18,7 +35,13 @@ class DFBuilder:
         return self
 
     def convert_str_to_numeric(self, column):
-        self.df[column] = pd.to_numeric(self.df[column].str.replace(',',''))
+        self.df[column] = self.df[column].str.replace(',','')
+        self.df[column] = self.df[column].str.replace('$','')
+        self.df[column] = pd.to_numeric(self.df[column])
+        return self
+
+    def take_abs_value(self, column):
+        self.df[column] = abs(self.df[column])
         return self
 
     def fill_in_missing_months(self):
