@@ -34,7 +34,6 @@ Max Bandwidth Per Month 1 GB
 4. Index funds
 5. Tesla
 6. Zoom
-7. Google
 8. Each individual fund
 9. All funds together
 10. 

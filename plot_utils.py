@@ -15,6 +15,12 @@ class DataPlotter:
         full_name = [fund for fund in self.mappings if fund['ticker'] == ticker][0]['name']
         return f'{full_name} ({ticker.upper()}) {additional_text}'
 
+    def _get_contrib_label(self, ticker):
+        if ticker == 'ping':
+            return 'Vested RSU'
+        else:
+            return 'Total Contribution'
+
     def draw(self, df, ticker, additional_text=""):
         # set up chart
         fig, ax = plt.subplots()
@@ -30,7 +36,7 @@ class DataPlotter:
 
         # plot data
         values_x_loc = self._get_next_bar_loc(df.index)
-        contributions = ax.bar(df.index, df['Total Contrib'], 5, color="blue", label="Total Contribution", linewidth=0)
+        contributions = ax.bar(df.index, df['Total Contrib'], 5, color="blue", label=self._get_contrib_label(ticker), linewidth=0)
         value = ax.bar(values_x_loc, df['Total Value'], 5, color="orange", label="Total Value", linewidth=0)
 
         ax.legend()
