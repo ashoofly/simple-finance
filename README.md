@@ -30,12 +30,10 @@ Max Bandwidth Per Month 1 GB
 * Blur out y-axis of charts and post examples
 
 ## Next
-1. Ally climate
-2. Vanguard climate
-3. Add all climate funds together
-4. Index funds
-5. Tesla
-6. Zoom
-8. Each individual fund
-9. All funds together
-10. 
+2. Finish running Vanguard funds (VTI, VPL, VCSH)
+3. QCLN add into one: Ally + Fidelity together
+4. Add all climate funds together
+5. Add all index funds together
+6. Add all liquid funds
+7. Add all bonds
+8. All funds together
