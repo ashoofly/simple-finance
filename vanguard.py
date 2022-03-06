@@ -38,4 +38,4 @@ class Vanguard:
 if __name__ == "__main__":
     v = Vanguard()
     print(v.get_holdings())
-    print(v.convert_to_df('vti'))
+    print(v.convert_to_df('vpl'))
