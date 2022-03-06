@@ -10,7 +10,7 @@ logging.basicConfig(filename='./logs/tiingo.log', encoding='utf-8', level=loggin
 class TiingoClient:
     def __init__(self, ticker):
         self.ticker = ticker
-        self.json_file = f'./historical/{ticker}.json'
+        self.json_file = f'./historical/{ticker.lower()}.json'
         self.record = self.load_record()
         self.eod_price_url_template = "https://api.tiingo.com/tiingo/daily/{ticker}/prices?startDate={start_date}&endDate={end_date}"
         self.auth_header = {'Authorization': f'Token {os.getenv("TIINGO_API_KEY")}'}
