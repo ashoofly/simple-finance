@@ -31,8 +31,9 @@ class Vanguard:
              .get_total_contrib_shares_columns('Amount', 'Quantity') \
              .get_total_value_column(sym) \
              .build()
-        print(self.df)
-        DataPlotter().draw(self.df, sym.lower(), " - Vanguard")
+        # print(self.df)
+        # DataPlotter().draw_single_ticker(self.df, sym.lower(), " - Vanguard")
+        return self.df
 
 
 if __name__ == "__main__":

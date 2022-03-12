@@ -3,10 +3,14 @@ import argparse
 import sys
 import json
 from fidelity import Fidelity
+from pandas_utils import DFBuilder
 from vanguard import Vanguard
 from ally import Ally
 from plot_utils import DataPlotter
 from retirement import FidelityRetirementFund
+import pandas as pd
+from pandas_utils import DFBuilder
+
 
 class Finance():
     def __init__(self):
@@ -30,34 +34,49 @@ class Finance():
 
     def plot_retirement_fund(self):
         df = self.retirement.convert_to_df()
-        DataPlotter().draw(df, self.retirement.ticker, self.retirement.additional_title_text)
+        DataPlotter().draw_single_ticker(df, self.retirement.ticker, self.retirement.additional_title_text)
 
     def list_funds_with_tag(self, tag):
         print([ticker['ticker'] for ticker in self.mappings if tag in ticker['tags']])
         print([ticker['brokerages'] for ticker in self.mappings if tag in ticker['tags']])
 
+    def get_dataframe_for(self, ticker):
+        brokerage_info = [ticker_info for ticker_info in self.mappings if ticker_info['ticker'] == ticker][0][
+            'brokerages']
+        frames = []
+        for brokerage in brokerage_info:
+            brokerage_analyzer = self.choose_brokerage(brokerage)
+            df = brokerage_analyzer.convert_to_df(ticker)
+            frames.append(df)
+        if len(frames) > 1:
+            result = pd.concat(frames)
+            result.index.name = 'Date'
+            result = result.groupby('Date')['Total Contrib', 'Total Shares'].sum()
+            final_result = DFBuilder(result).get_total_value_column(ticker).build()
+            additional_text = brokerage_info
+        else:
+            final_result = frames[0]
+            additional_text = brokerage_info[0]
+        return final_result, additional_text
+
     def plot_historical_performance(self, ticker='', tag=''):
         if ticker:
-            # TODO: add handling if can't find ticker in mappings
-            # TODO: add check for multiple brokerages bleh.
-            brokerage_info = [ticker_info for ticker_info in self.mappings if ticker_info['ticker'] == ticker][0]['brokerages'][0]
-            brokerage = self.choose_brokerage(brokerage_info)
-            df = brokerage.convert_to_df(ticker)
-            DataPlotter().draw(df, ticker, brokerage.additional_title_text)
+            dataframe, additional_text = self.get_dataframe_for(ticker)
+            DataPlotter().draw_single_ticker(dataframe, ticker, f' - {additional_text}')
         elif tag:
-            for brokerage in self.brokerages:
-                tag_funds = [ticker['ticker'] for ticker in self.mappings
-                             if tag in ticker['tags'] and brokerage.name in ticker['brokerages']]
-                for ticker in tag_funds:
-                    print(f'Plot historical performance for {ticker.upper()}? (y/n)')
-                    choice = input()
-                    if choice == 'y':
-                        df = brokerage.convert_to_df(ticker)
-                        DataPlotter().draw(df, ticker, brokerage.additional_title_text)
-                    else:
-                        continue
-                # have only implemented Fidelity so far
-                exit(0)
+            tickers = [ticker['ticker'] for ticker in self.mappings if tag in ticker['tags']]
+            dataframes = {}
+            for ticker in tickers:
+                dataframe, additional_text = self.get_dataframe_for(ticker)
+                dataframes[ticker] = dataframe
+            DataPlotter().draw_multiple_tickers(dataframes, f'{tag.capitalize()} Funds')
+        else:
+            tickers = [ticker['ticker'] for ticker in self.mappings]
+            dataframes = {}
+            for ticker in tickers:
+                dataframe, additional_text = self.get_dataframe_for(ticker)
+                dataframes[ticker] = dataframe
+            DataPlotter().draw_all_tickers(dataframes, f'All Funds')
 
 
 if __name__ == '__main__':
@@ -96,4 +115,6 @@ Usage:
         f.plot_historical_performance(tag='climate')
     if args.retirement:
         f.plot_retirement_fund()
+    else:
+        f.plot_historical_performance()
 

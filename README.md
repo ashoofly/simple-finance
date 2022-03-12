@@ -30,9 +30,6 @@ Max Bandwidth Per Month 1 GB
 * Blur out y-axis of charts and post examples
 
 ## Next
-3. QCLN add into one: Ally + Fidelity together
-4. Add all climate funds together
-5. Add all index funds together
+5. Compare fossil free index funds vs regular index funds percent gain per month
 6. Add all liquid funds
 7. Add all bonds
-8. All funds together

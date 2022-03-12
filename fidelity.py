@@ -20,5 +20,4 @@ class Fidelity:
             .get_total_contrib_shares_columns('cost_basis', 'shares')\
             .get_total_value_column(ticker)\
             .build()
-        print(df)
         return df

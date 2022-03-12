@@ -18,5 +18,4 @@ class FidelityRetirementFund:
             .get_total_contrib_shares_columns('Amount', 'Shares/Unit')\
             .get_total_value_column(ticker)\
             .build()
-        print(self.df)
         return self.df

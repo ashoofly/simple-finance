@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 from tiingo_client import TiingoClient
 
@@ -44,8 +46,10 @@ class DFBuilder:
         self.df[column] = abs(self.df[column])
         return self
 
-    def fill_in_missing_months(self):
-        self.df = self.df.reindex(pd.date_range(self.df.index[0], pd.to_datetime('now'), freq='M'), fill_value=0.0)
+    def fill_in_missing_months(self, start_month=''):
+        if not start_month:
+            start_month = self.df.index[0]
+        self.df = self.df.reindex(pd.date_range(start_month, pd.to_datetime('now'), freq='M'), fill_value=0.0)
         return self
 
     def get_total_contrib_shares_columns(self, contrib, shares):
@@ -64,4 +68,8 @@ class DFBuilder:
             total_value = total_shares * closing_price
             total_value_by_month.append(total_value)
         self.df['Total Value'] = total_value_by_month
+        return self
+
+    def set_index_name(self, name):
+        self.df.index.name = name
         return self

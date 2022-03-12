@@ -16,7 +16,6 @@ class TiingoClient:
         self.auth_header = {'Authorization': f'Token {os.getenv("TIINGO_API_KEY")}'}
 
     def __del__(self):
-        print(f"[TiingoClient] Saving historical record to: {self.json_file}")
         self.save_record()
 
     def load_record(self):
@@ -41,7 +40,6 @@ class TiingoClient:
     def _get_month_historical(self, date):
         month_entry = {key: value for key, value in self.record.items() if key.startswith(date[:7])}
         if len(month_entry.values()) == 1:
-            print(f"Found historical EOD record for {date[:7]} in cache, not calling Tiingo API.")
             return list(month_entry.values())[0]
         else:
             return None
