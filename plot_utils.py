@@ -35,14 +35,14 @@ class DataPlotter:
         else:
             return 'Total Contribution'
 
-    def _setup_chart(self, is_single=False, main_text='', subtext=''):
+    def _setup_chart(self, is_single=False, main_text='', subtext='', xlabel='Month', ylabel='Amount (US$)'):
         # set up chart
         if is_single:
             plt.title(self._get_single_ticker_title(main_text, subtext))
         else:
             plt.title(main_text)
-        self.ax.set_xlabel("Month")
-        self.ax.set_ylabel("Amount (US$)")
+        self.ax.set_xlabel(xlabel)
+        self.ax.set_ylabel(ylabel)
 
         # format x-axis
         self.ax.xaxis_date()
@@ -96,6 +96,8 @@ class DataPlotter:
             values.append(df['Total Value'].tolist())
             i += 1
         self._show_plot()
+        current_total_value = [sum(y) for y in zip(*values)][-1]
+        return current_total_value
 
     def draw_all_tickers(self, dataframes, title):
         self._setup_chart(False, title)
@@ -134,6 +136,16 @@ class DataPlotter:
         print(f'Current Total Value: {locale.currency(current_total_value, grouping=True)}')
         print(f'Total Current Gain: {locale.currency(current_net_gain, grouping=True)}')
         print(f'Total Percent Gain: {"{:.0%}".format(percent_net_gain)}')
+        self._show_plot()
 
-
+    def compare_tags(self, dataframes, title):
+        self._setup_chart(False, title, ylabel='Percent Gain')
+        i = 0
+        for tag, df in dataframes.items():
+            values_x_loc = self._get_next_bar_loc(df.index)
+            if i == 0:
+                self.ax.bar(df.index, df['Percent Gain'], 5, color=bar_colors[i], label=tag)
+            else:
+                self.ax.bar(values_x_loc, df['Percent Gain'], 5, color=bar_colors[i], label=tag)
+            i += 1
         self._show_plot()

@@ -10,6 +10,9 @@ from plot_utils import DataPlotter
 from retirement import FidelityRetirementFund
 import pandas as pd
 from pandas_utils import DFBuilder
+from functools import reduce
+import matplotlib.pyplot as plt
+
 
 
 class Finance():
@@ -59,6 +62,44 @@ class Finance():
             additional_text = brokerage_info[0]
         return final_result, additional_text
 
+    def compare_tags(self, tags):
+        dataframes = {}
+        for tag in tags:
+            dataframes[tag] = self.add_percent_gain_column(tag)
+        start_month = min(reduce(lambda a, b: a + b, [list(df.index) for tag, df in dataframes.items()]))
+        final_dfs = {}
+        for tag, df in dataframes.items():
+            final_dfs[tag] = DFBuilder(df).fill_in_missing_months(start_month).build()
+        return final_dfs
+
+    def add_percent_gain_column(self, tag):
+        tickers = [ticker['ticker'] for ticker in self.mappings if tag in ticker['tags']]
+        dataframes_tag = []
+        for ticker in tickers:
+            dataframe, additional_text = self.get_dataframe_for(ticker)
+            dataframes_tag.append(dataframe)
+        result = pd.concat(dataframes_tag)
+        result.index.name = 'Date'
+        result = result.groupby('Date')['Total Contrib', 'Total Value'].sum()
+        result['Percent Gain'] = (result['Total Value'] - result['Total Contrib']) / result['Total Contrib'] * 100
+        return result
+
+    def draw_pie_chart(self):
+        tags = ['climate', 'index', 'single', 'esg', 'bonds']
+        total_values = []
+        for tag in tags:
+            tickers = [ticker['ticker'] for ticker in self.mappings if tag in ticker['tags']]
+            dataframes = {}
+            for ticker in tickers:
+                dataframe, additional_text = self.get_dataframe_for(ticker)
+                dataframes[ticker] = dataframe
+            current_total_value = DataPlotter().draw_multiple_tickers(dataframes, f'{tag.capitalize()} Funds')
+            total_values.append(current_total_value)
+        fig1, ax1 = plt.subplots()
+        ax1.pie(total_values, labels=tags, autopct='%1.1f%%', startangle=90)
+        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        plt.show()
+
     def plot_historical_performance(self, ticker='', tag=''):
         if ticker:
             dataframe, additional_text = self.get_dataframe_for(ticker)
@@ -93,6 +134,8 @@ Usage:
 ./finance.py --retirement     Displays progress chart for retirement fund
 ./finance.py --ss             Displays progress chart for all single stocks
 ./finance.py --rsu            Displays progress chart for RSUs
+
+./finance.py --versus=climate,index
 """
     parser = argparse.ArgumentParser(description=help_description, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-t', '--ticker', type=str, help='ticker symbol', required=False)
@@ -110,10 +153,14 @@ Usage:
     f = Finance()
     if args.ticker:
         f.plot_historical_performance(ticker=args.ticker)
-    if args.climate:
-        f.list_funds_with_tag('climate')
-        f.plot_historical_performance(tag='climate')
-    if args.retirement:
+    elif args.climate:
+        #f.list_funds_with_tag('climate')
+        #f.plot_historical_performance(tag='climate')
+        #f.list_funds_with_tag('index')
+        #dataframes = f.compare_tags(['climate', 'index'])
+        #DataPlotter().compare_tags(dataframes, f'Climate vs Index')
+        f.draw_pie_chart()
+    elif args.retirement:
         f.plot_retirement_fund()
     else:
         f.plot_historical_performance()
